@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - සටහන් පොත</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Noto Sans Sinhala', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 { text-align: center; color: #667eea; margin-bottom: 30px; }
+        h2 { color: #667eea; margin: 20px 0; }
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+        input[type="text"], input[type="password"], select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: 'Noto Sans Sinhala', sans-serif;
+        }
+        .password-container {
+            position: relative;
+        }
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            padding: 5px;
+            color: #667eea;
+        }
+        .toggle-password:hover {
+            color: #764ba2;
+        }
+        textarea {
+            min-height: 400px;
+            resize: vertical;
+        }
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Noto Sans Sinhala', sans-serif;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 100%;
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #34a853 0%, #2d9248 100%);
+            color: white;
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #ea4335 0%, #d33b2c 100%);
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .lessons-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .lessons-table th, .lessons-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .lessons-table th {
+            background: #667eea;
+            color: white;
+        }
+        .lessons-table tr:hover {
+            background: #f5f5f5;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .action-buttons button {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+        .hidden { display: none; }
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .category-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .category-tab {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            background: white;
+            color: #667eea;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .category-tab.active {
+            background: #667eea;
+            color: white;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+        }
+        .editor-toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .editor-btn {
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .editor-btn:hover {
+            background: #5568d3;
+        }
+    </style>
+</head>
+<body>
+    <div id="loginView" class="login-container">
+        <h1>🔐 Admin Login</h1>
+        <div class="form-group">
+            <label>Password</label>
+            <div class="password-container">
+                <input type="password" id="loginPassword" placeholder="Enter admin password">
+                <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">👁️</button>
+            </div>
+        </div>
+        <button class="btn-primary" onclick="login()">Login</button>
+        <div id="loginError" class="alert alert-error hidden" style="margin-top: 20px;"></div>
+    </div>
+
+    <div id="adminView" class="admin-container hidden">
+        <div class="top-bar">
+            <h1>📝 සටහන් පොත Admin Panel</h1>
+            <button class="btn-secondary" onclick="logout()">Logout</button>
+        </div>
+
+        <div id="alertBox"></div>
+
+        <div class="category-tabs">
+            <button class="category-tab active" data-category="slhis" onclick="selectCategory('slhis')">ශ්‍රී ලංකාව</button>
+            <button class="category-tab" data-category="erphis" onclick="selectCategory('erphis')">යුරෝපය</button>
+            <button class="category-tab" data-category="indhis" onclick="selectCategory('indhis')">ඉන්දියාව</button>
+        </div>
+
+        <button class="btn-success" onclick="showAddForm()" style="margin-bottom: 20px;">➕ නව පාඩමක් එකතු කරන්න</button>
+
+        <div id="lessonsListView">
+            <h2>සටහන් ලැයිස්තුව</h2>
+            <table class="lessons-table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Slug</th>
+                        <th>Category</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="lessonsTableBody"></tbody>
+            </table>
+        </div>
+
+        <div id="editView" class="hidden">
+            <h2 id="editTitle">සටහන සංස්කරණය කරන්න</h2>
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" id="editLessonTitle" placeholder="පාඩමේ නම ඇතුලත් කරන්න">
+            </div>
+            <div class="form-group">
+                <label>Slug (slhis01, erphis02, indhis03 ආදිය)</label>
+                <input type="text" id="editLessonSlug" placeholder="slug ඇතුලත් කරන්න">
+            </div>
+            <div class="form-group">
+                <label>Content (HTML)</label>
+                <div class="editor-toolbar">
+                    <button class="editor-btn" onclick="insertTag('h1')">H1</button>
+                    <button class="editor-btn" onclick="insertTag('h2')">H2</button>
+                    <button class="editor-btn" onclick="insertTag('h3')">H3</button>
+                    <button class="editor-btn" onclick="insertTag('p')">P</button>
+                    <button class="editor-btn" onclick="insertTag('strong')">Bold</button>
+                    <button class="editor-btn" onclick="insertTag('em')">Italic</button>
+                    <button class="editor-btn" onclick="insertTag('ul')">List</button>
+                </div>
+                <textarea id="editLessonContent" placeholder="HTML content ඇතුලත් කරන්න"></textarea>
+            </div>
+            <div class="action-buttons">
+                <button class="btn-success" onclick="saveLesson()">💾 Save</button>
+                <button class="btn-secondary" onclick="cancelEdit()">❌ Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://uqgzlaxsnknheoerbfus.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVxZ3psYXhzbmtuaGVvZXJiZnVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM5MjM2MTUsImV4cCI6MjA3OTI4MzYxNX0.IYWZ7ukx8J-GJMWy7cMk2BWnmzJmJjjE93yEmJie7nQ';
+        const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let state = {
+            isLoggedIn: false,
+            currentCategory: 'slhis',
+            lessons: [],
+            editingLesson: null
+        };
+
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('loginPassword');
+            const toggleBtn = document.querySelector('.toggle-password');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleBtn.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                toggleBtn.textContent = '👁️';
+            }
+        }
+
+        // SHA-256 Hash Function
+        async function sha256(message) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return hashHex;
+        }
+
+        async function login() {
+            const password = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('loginError');
+            
+            if (!password) {
+                errorDiv.textContent = 'Please enter password';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                // Hash the entered password
+                const hashedPassword = await sha256(password);
+                
+                console.log('=== Password Debug ===');
+                console.log('Entered password:', password);
+                console.log('Hashed password:', hashedPassword);
+
+                // Query for ADMIN_26 access code
+                const { data, error } = await sbClient
+                    .from('credentials')
+                    .select('*')
+                    .eq('access_code', 'ADMIN_26')
+                    .single();
+
+                if (error) throw error;
+
+                if (!data) {
+                    errorDiv.textContent = 'Admin credentials not found';
+                    errorDiv.classList.remove('hidden');
+                    return;
+                }
+
+                console.log('Database password:', data.password_hash);
+                console.log('Passwords match:', data.password_hash === hashedPassword);
+
+                // Check if account is active
+                if (data.is_active === false) {
+                    errorDiv.textContent = 'Admin account is disabled';
+                    errorDiv.classList.remove('hidden');
+                    return;
+                }
+
+                // Compare hashed password with database password_hash
+                if (data.password_hash === hashedPassword) {
+                    // Update last_login
+                    await sbClient
+                        .from('credentials')
+                        .update({ last_login: new Date().toISOString() })
+                        .eq('access_code', 'ADMIN_26');
+
+                    state.isLoggedIn = true;
+                    document.getElementById('loginView').classList.add('hidden');
+                    document.getElementById('adminView').classList.remove('hidden');
+                    loadLessons();
+                } else {
+                    errorDiv.textContent = 'Invalid password';
+                    errorDiv.classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error('Login error:', err);
+                errorDiv.textContent = 'Login error: ' + err.message;
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
+        function logout() {
+            state.isLoggedIn = false;
+            document.getElementById('loginView').classList.remove('hidden');
+            document.getElementById('adminView').classList.add('hidden');
+            document.getElementById('loginPassword').value = '';
+        }
+
+        function selectCategory(category) {
+            state.currentCategory = category;
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-category="${category}"]`).classList.add('active');
+            loadLessons();
+        }
+
+        async function loadLessons() {
+            try {
+                const { data, error } = await sbClient
+                    .from('Historynt')
+                    .select('*')
+                    .like('slug', state.currentCategory + '%')
+                    .order('slug', { ascending: true });
+
+                if (error) throw error;
+
+                state.lessons = data;
+                displayLessons();
+            } catch (err) {
+                console.error('Error loading lessons:', err);
+                showAlert('Failed to load lessons: ' + err.message, 'error');
+            }
+        }
+
+        function displayLessons() {
+            const tbody = document.getElementById('lessonsTableBody');
+            tbody.innerHTML = state.lessons.map(lesson => `
+                <tr>
+                    <td>${lesson.title}</td>
+                    <td>${lesson.slug}</td>
+                    <td>${getCategoryName(lesson.slug)}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-success" onclick="editLesson('${lesson.slug}')">✏️ Edit</button>
+                            <button class="btn-danger" onclick="deleteLesson('${lesson.slug}', '${lesson.title}')">🗑️ Delete</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function getCategoryName(slug) {
+            if (slug.startsWith('slhis')) return 'ශ්‍රී ලංකාව';
+            if (slug.startsWith('erphis')) return 'යුරෝපය';
+            if (slug.startsWith('indhis')) return 'ඉන්දියාව';
+            return 'Unknown';
+        }
+
+        function showAddForm() {
+            state.editingLesson = null;
+            document.getElementById('editTitle').textContent = 'නව පාඩමක් එකතු කරන්න';
+            document.getElementById('editLessonTitle').value = '';
+            document.getElementById('editLessonSlug').value = '';
+            document.getElementById('editLessonContent').value = '';
+            document.getElementById('lessonsListView').classList.add('hidden');
+            document.getElementById('editView').classList.remove('hidden');
+        }
+
+        function editLesson(slug) {
+            const lesson = state.lessons.find(l => l.slug === slug);
+            if (!lesson) return;
+
+            state.editingLesson = lesson;
+            document.getElementById('editTitle').textContent = 'සටහන සංස්කරණය කරන්න';
+            document.getElementById('editLessonTitle').value = lesson.title;
+            document.getElementById('editLessonSlug').value = lesson.slug;
+            document.getElementById('editLessonContent').value = lesson.content;
+            document.getElementById('lessonsListView').classList.add('hidden');
+            document.getElementById('editView').classList.remove('hidden');
+        }
+
+        function cancelEdit() {
+            document.getElementById('editView').classList.add('hidden');
+            document.getElementById('lessonsListView').classList.remove('hidden');
+        }
+
+        async function saveLesson() {
+            const title = document.getElementById('editLessonTitle').value.trim();
+            const slug = document.getElementById('editLessonSlug').value.trim();
+            const content = document.getElementById('editLessonContent').value.trim();
+
+            if (!title || !slug || !content) {
+                showAlert('Please fill all fields', 'error');
+                return;
+            }
+
+            try {
+                if (state.editingLesson) {
+                    // Update existing
+                    const { error } = await sbClient
+                        .from('Historynt')
+                        .update({ title, slug, content })
+                        .eq('slug', state.editingLesson.slug);
+
+                    if (error) throw error;
+                    showAlert('සටහන සාර්ථකව යාවත්කාලීන කරන ලදී!', 'success');
+                } else {
+                    // Insert new
+                    const { error } = await sbClient
+                        .from('Historynt')
+                        .insert([{ title, slug, content }]);
+
+                    if (error) throw error;
+                    showAlert('නව සටහන සාර්ථකව එකතු කරන ලදී!', 'success');
+                }
+
+                cancelEdit();
+                loadLessons();
+            } catch (err) {
+                console.error('Save error:', err);
+                showAlert('Error saving: ' + err.message, 'error');
+            }
+        }
+
+        async function deleteLesson(slug, title) {
+            if (!confirm(`"${title}" මකා දැමීමට විශ්වාසද?`)) return;
+
+            try {
+                const { error } = await sbClient
+                    .from('Historynt')
+                    .delete()
+                    .eq('slug', slug);
+
+                if (error) throw error;
+                showAlert('සටහන සාර්ථකව මකා දමන ලදී!', 'success');
+                loadLessons();
+            } catch (err) {
+                console.error('Delete error:', err);
+                showAlert('Error deleting: ' + err.message, 'error');
+            }
+        }
+
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.innerHTML = `<div class="alert alert-${type === 'error' ? 'error' : 'success'}">${message}</div>`;
+            setTimeout(() => { alertBox.innerHTML = ''; }, 5000);
+        }
+
+        function insertTag(tag) {
+            const textarea = document.getElementById('editLessonContent');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const selectedText = textarea.value.substring(start, end);
+            
+            let insertion;
+            if (tag === 'ul') {
+                insertion = `<ul>\n  <li>${selectedText || 'Item 1'}</li>\n  <li>Item 2</li>\n</ul>`;
+            } else {
+                insertion = `<${tag}>${selectedText || 'Text'}</${tag}>`;
+            }
+            
+            textarea.value = textarea.value.substring(0, start) + insertion + textarea.value.substring(end);
+            textarea.focus();
+        }
+
+        // Enter key login
+        document.getElementById('loginPassword')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') login();
+        });
+    </script>
+</body>
+</html>
