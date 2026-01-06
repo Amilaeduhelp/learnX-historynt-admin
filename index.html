@@ -105,18 +105,124 @@
             width: 100%;
             border-collapse: collapse;
             margin: 20px 0;
+            overflow-x: auto;
+            display: block;
         }
         .lessons-table th, .lessons-table td {
             padding: 12px;
             text-align: left;
             border-bottom: 1px solid #ddd;
+            white-space: nowrap;
         }
         .lessons-table th {
             background: #667eea;
             color: white;
+            position: sticky;
+            top: 0;
         }
         .lessons-table tr:hover {
             background: #f5f5f5;
+        }
+        .lessons-table tbody {
+            display: table;
+            width: 100%;
+        }
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .login-container {
+                max-width: 100%;
+                margin: 50px auto;
+                padding: 25px;
+            }
+            .admin-container {
+                padding: 15px;
+                margin: 0;
+            }
+            h1 { font-size: 1.5em; }
+            h2 { font-size: 1.2em; }
+            .top-bar {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+            .category-tabs {
+                flex-direction: column;
+            }
+            .category-tab {
+                width: 100%;
+            }
+            .lessons-table {
+                font-size: 14px;
+            }
+            .lessons-table th, .lessons-table td {
+                padding: 8px 4px;
+                font-size: 12px;
+            }
+            .action-buttons {
+                flex-direction: column;
+                gap: 5px;
+            }
+            .action-buttons button {
+                width: 100%;
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+            .editor-toolbar {
+                gap: 5px;
+            }
+            .editor-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+            textarea {
+                min-height: 300px;
+                font-size: 14px;
+            }
+            input[type="text"], input[type="password"], select {
+                font-size: 14px;
+                padding: 10px;
+            }
+            button {
+                font-size: 14px;
+                padding: 10px 20px;
+            }
+        }
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 20px;
+                margin: 30px 10px;
+            }
+            h1 { font-size: 1.3em; }
+            .lessons-table {
+                display: block;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .lessons-table thead {
+                display: none;
+            }
+            .lessons-table tr {
+                display: block;
+                margin-bottom: 15px;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                padding: 10px;
+                background: white;
+            }
+            .lessons-table td {
+                display: block;
+                text-align: left;
+                padding: 8px 0;
+                border: none;
+                white-space: normal;
+            }
+            .lessons-table td:before {
+                content: attr(data-label);
+                font-weight: bold;
+                display: inline-block;
+                width: 100px;
+                color: #667eea;
+            }
         }
         .action-buttons {
             display: flex;
